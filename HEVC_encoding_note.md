@@ -9,12 +9,12 @@ There are a few possibilities here:
 * The decoder is decoding correctly, but simply misreporting the vertical size in the video metadata as the encoded size instead of the size indicated in the sequence headers. That's a decoder bug, but just a cosmetic bug with the metadata it reports.
 * The encoder is incorrectly setting the vertical size in the sequence headers to 1088 instead of 1080. That's an encoder bug.
 
-So to understand where the problem lies, the encoded video stream needs to be checked with different decoders. ffmpeg almost certainly reports the vertical size correctly, so I'd recommend checking with that. If ffmpeg says 1088, then the video was encoded incorrectly. If ffmpeg says 1080, then the other decoder was decoding incorrectly and/or reporting the vertical size incorrectly.
+So to understand where the problem lies, the encoded video stream needs to be checked with different decoders. `ffmpeg` almost certainly reports the vertical size correctly, so I'd recommend checking with that. If `ffmpeg` says 1088, then the video was encoded incorrectly. If `ffmpeg` says 1080, then the other decoder was decoding incorrectly and/or reporting the vertical size incorrectly.
 
 ## My Case
-HEVC videos encoded by NVEnc may show incorrect resolution readings in File Explorer's file properties. 4K HEVC videos encoded by NVEnc will be rendered at 3840x2176 when using `cuvid` as decoder.
+HEVC videos encoded by `NVEnc` may show incorrect resolution readings in File Explorer's file properties. 4K HEVC videos encoded by `NVEnc` will be rendered at 3840x2176 when using `cuvid` as decoder.
 
-ffmpeg shows correct resolution readings and DXVA renders the video correctly.
+`ffmpeg` shows correct resolution readings and DXVA renders the video correctly.
 
 ## Conclusion
-I'm not sure whether it's NVEnc's fault at encoding time or decoder's bug.
+I'm not sure whether it's `NVEnc`'s fault at encoding time or decoder's bug.
