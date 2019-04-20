@@ -13,7 +13,7 @@ Enjoy :D
 * [Configuring xrdp to run a Gnome session with Xorg](Configure_xrdp.md)
 * [How to Connect to A Remote Hyper-V Server Using Powershell](Connect_to_A_Remote_Hyper-V_Server_Using_Powershell)
 * [Fedora Notes](Fedora_Notes.md)
-* [Gnome Keyring and SSH Keys](Gnome_Keyring_and_SSH_Keys.md)
+* [Gnome Keyring and SSH Keys](Gnome_Keyring_and_SSH_keys.md)
 * [`halt` vs `reboot` vs `poweroff`](halt_reboot_poweroff.md)
 * [HEVC Encoding Notes](HEVC_encoding_notes.md)
 * [Hyper-V Notes](Hyper-V_Notes.md)
