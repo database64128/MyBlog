@@ -1,8 +1,10 @@
-# Some Notes About Fedora Workstation
+# Fedora Server/Workstation - Notes
+
+*Updated 2019-04-14: Changed title.*
 
 *Updated 2019-03-05: Added `firewalld` for Fedora Workstation 29.*
 
-Some notes regarding day-to-day usage of Fedora Workstation.
+Some notes of day-to-day usage of Fedora Workstation.
 
 ## 1. SELinux
 
@@ -57,4 +59,24 @@ Max kernel policy version:      28
 ## 3. `firewalld` uses `nftables` as the default backend
 Starting from Fedora Workstation 29, with the release of `firewalld 0.6.0`, `firewalld` uses the new `nftables` as the new default backend. This change will come with CentOS 8 too.
 
-Refer to [Configuring `firewalld`](Configuring_firewalld.md) for more information on how to configure `firewalld`.
+Refer to [Configuring `firewalld`](Configuring_firewalld.md) for more information about how to configure `firewalld`.
+
+## 3. Change TLS certificate for `cockpit`
+On a typical Fedora Server installation, `cockpit` is enabled by default as a web control interface. It provides an straight forward way for admins to manage one or multiple servers.
+
+However, *as of 2019-04-17, on Fedora Server 29, cockpit only supports password login and use a self-signed certificate by default, which is not a safe practice.* Therefore, it's necessary to change the certificate to a proper one.
+
+Instead of allowing user to set certificate and key path, `cockpit` only accepts certificates in `/etc/cockpit/ws-certs.d/`. It requires a combination of certificate and key file, and selects the last certificate in alphabetical order.
+
+Run the following commands to merge a typical `certbot` certificate and key into a certificate `cockpit` can recognize:
+
+```shell
+cat /etc/letsencrypt/live/DOMAIN.com/fullchain.pem >> /etc/cockpit/ws-certs.d/1-my-cert.cert
+cat /etc/letsencrypt/live/DOMAIN.com/privkey.pem >> /etc/cockpit/ws-certs.d/1-my-cert.cert
+```
+
+On the one hand, Fedora has `SELinux` enabled by default, which enforces some strict "security" rules. On the other hand, they have `cockpit`, which is poorly designed in terms of security. What can I say? This is what these security "experts" call __security__.
+
+### References
+* [Install cockpit on CentOS 7.3 with valid certificates from letsencrypt](https://linuxproperties.com/install-cockpit-on-centos-7-3-with-valid-certificates-from-letsencrypt/)
+* [Cockpit Documentation - SSL/TLS Usage](https://cockpit-project.org/guide/latest/https.html)
