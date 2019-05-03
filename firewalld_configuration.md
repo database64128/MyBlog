@@ -1,4 +1,4 @@
-# Configure `firewalld`
+# Configuring `firewalld`
 
 With the release of `firewalld 0.6.0`, `firewalld` uses the new `nftables` as the new default backend. This change will come with CentOS 8 too.
 
