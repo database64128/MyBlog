@@ -114,6 +114,10 @@ The output `.ovpn` file should be modified to match server configuration.
 
 Run `openvpn /etc/openvpn/server/server.conf` to test configuration. When everything is ready, start the server service: `systemctl enable --now openvpn-server@server.service`.
 
+## Troubleshooting
+### ERROR: Cannot open TUN/TAP dev /dev/net/tun: No such device (errno=19)
+After a kernel update, a reboot is needed to be able to load new modules.
+
 ## References
 * [OpenVPN - ArchWiki](https://wiki.archlinux.org/index.php/OpenVPN)
 * [Easy-RSA - ArchWiki](https://wiki.archlinux.org/index.php/Easy-RSA)
@@ -123,3 +127,5 @@ Run `openvpn /etc/openvpn/server/server.conf` to test configuration. When everyt
 * [Internet sharing - ArchWiki](https://wiki.archlinux.org/index.php/Internet_sharing#Enable_packet_forwarding)
 * [GettingStartedwithOVPN – OpenVPN Community](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
 * [2x HOW TO | OpenVPN](https://openvpn.net/community-resources/how-to/)
+* [[Solved] OpenVPN 2.3.1 - ERROR: Cannot open TUN/TAP dev /dev/net/tun / Networking, Server, and Protection / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=163377)
+* [OpenVPN 2.4 and pure elliptic curve crypto setup - Page 2 - OpenVPN Support Forum](https://forums.openvpn.net/viewtopic.php?t=23227&start=30)
