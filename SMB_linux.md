@@ -40,9 +40,11 @@ Configure your firewall to allow traffic for `samba`:
 ```
 Now start the service:
 ```shell
-# systemctl enable --now samba.service
+# systemctl enable --now smb.service nmb.service
 ```
-The SMB server should be up and accessible in your local network.
+Now the SMB server should be up and discoverable in your local network.
+
+Note that previously `smbd.service` and `nmbd.servive` has been renamed with 'd' dropped. Don't use `samba.service` as they are completely different services.
 
 ## SMB client - `smbclient`
 `smbclient` is an FTP-like SMB client. Install and use `smbclient` to query, browse or mount any SMB share.

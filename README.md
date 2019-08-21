@@ -26,6 +26,7 @@ Enjoy. 😁
 * [Performance Impacts of CPU Hyper-Threading on Virtualization applications](Virtualization_Hyper-Threading.md)
 * [Why are Windows Inbox Drivers all signed 2006?](Windows_Inbox_Driver_2006.md)
 * [Workaround: On Windows 10 Version 1903, `dwm.exe` stuck in a single-thread loop after disconnecting from an RDP session](Workaround_Win_1903_dwm_loop_RDP.md)
+* [Snapper manual configurations: Creating and Restoring](snapper_manual_config.md)
 
 ## License
 Licensed under the [CC-BY-SA-4.0](LICENSE) license.
