@@ -13,7 +13,7 @@ Pre-defined servers are located in `/usr/lib/firewalld/services`. Copy one of th
 
 ```shell
 # cp /usr/lib/firewalld/services/ssh.xml /etc/firewalld/services/ssh_customized.xml
-#nano /etc/firewalld/services/ssh_customized.xml
+# nano /etc/firewalld/services/ssh_customized.xml
 ```
 
 An example of a service's xml is like this:
@@ -25,6 +25,11 @@ An example of a service's xml is like this:
   <port protocol="tcp" port="53"/>
   <port protocol="udp" port="53"/>
 </service>
+```
+
+Note that, after creation or modification of service files, you have to reload the firewall to force load changes.
+```shell
+# firewall-cmd --reload
 ```
 
 ### 2. Add your customized services to a zone
