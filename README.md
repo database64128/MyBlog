@@ -26,6 +26,7 @@ Enjoy. 😁
 * [Snapper manual configurations: Creating and Restoring](snapper_manual_config.md)
 * [Performance Impacts of CPU Hyper-Threading on Virtualization applications](Virtualization_Hyper-Threading.md)
 * [Why are Windows Inbox Drivers all signed 2006?](Windows_Inbox_Driver_2006.md)
+* [Wordpress: Setting up my blog with `nginx` + `Wordpress` + `php-fgm`](wordpress_setting_up.md)
 * [Workaround: On Windows 10 Version 1903, `dwm.exe` stuck in a single-thread loop after disconnecting from an RDP session](Workaround_Win_1903_dwm_loop_RDP.md)
 
 ## License
