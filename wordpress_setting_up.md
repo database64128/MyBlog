@@ -27,7 +27,7 @@ So natually, I started the `apache` web server and finished the setup from the i
 Install all necessary packages with `pacman`:
 
 ```bash
-# pacman -S --needed nginx mariadb php php-gd php-fpm phpmyadmin
+# pacman -S --needed nginx mariadb php php-gd php-fpm phpmyadmin imagemagick php-imagick
 ```
 
 We are not installing `wordpress` with `pacman` but instead manually download and unzip:
@@ -77,6 +77,10 @@ Modify `/etc/php/php.ini` to enable extensions, increase the file size limit of 
 ```
 date.timezone = America/Los_Angeles
 
+extension=bcmath
+extension=bz2
+extension=curl
+extension=exif
 extension=gd
 extension=pdo_mysql
 extension=mysqli

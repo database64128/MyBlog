@@ -2,6 +2,7 @@
 
 *First edition 2019-05-08.*
 *Updated 2019-05-19: removed an incorrect step in 'firewalld' configuration and fixed IPv6 configuration.*
+*Updated 2019-11-25: added steps for IPv6 NDP setup.*
 
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
@@ -52,7 +53,7 @@ Get configuration examples in `/usr/share/openvpn/examples/` on Arch Linux, or `
 Here's an example:
 ```
 port 1194
-proto udp6/udp4
+proto udp6
 dev tun
 ca ca.crt
 cert servername.crt
@@ -108,14 +109,19 @@ firewall-cmd --runtime-to-permanent
 ## Finishing
 Use `ovpngen` to generate a `.ovpn` file for clients to use. Get the script from its [GitHub repo](https://github.com/graysky2/ovpngen), or [AUR](https://aur.archlinux.org/packages/ovpngen/).
 ```shell
-# ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/signed/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
+# ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/issued/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
 ```
 The output `.ovpn` file should be modified to match server configuration.
 
 Run `openvpn /etc/openvpn/server/server.conf` to test configuration. When everything is ready, start the server service: `systemctl enable --now openvpn-server@server.service`.
 
 ## IPv6
-To assign true public IPv6 addresses to clients, either set up a static route in your IPv6 gateway, or use DHCP-PD to get a prefix. Alternatively, if you have no access to these mentioned methods, an NDP proxy should work. See [this](https://unix.stackexchange.com/questions/136211/routing-public-ipv6-traffic-through-openvpn-tunnel).
+To assign public IPv6 addresses to clients, either set up a static route in your IPv6 gateway, or use DHCP-PD to get a prefix. Alternatively, if you don't have access to these methods, set up NDP (Neighbor Discovery Proxy) rules on the host machine. For example, the host machine faces a `/64` subnet via `eth0` and hosts a `/112` subnet via `tun0`. Enable IPv6 NDP in the kernel and add a NDP rule by executing:
+
+```bash
+$ sysctl net.ipv6.conf.all.proxy_ndp = 1
+$ ip neighbour add proxy 2001:abcd::1001 dev eth0
+```
 
 ## Troubleshooting
 ### ERROR: Cannot open TUN/TAP dev /dev/net/tun: No such device (errno=19)
@@ -134,4 +140,5 @@ After a kernel update, a reboot is needed to be able to load new modules.
 * [OpenVPN 2.4 and pure elliptic curve crypto setup - Page 2 - OpenVPN Support Forum](https://forums.openvpn.net/viewtopic.php?t=23227&start=30)
 * [#805 (Could not determine IPv4/IPv6 protocol. Using AF_INET) – OpenVPN Community](https://community.openvpn.net/openvpn/ticket/805#no1)
 * [Routing public ipv6 traffic through openvpn tunnel - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/136211/routing-public-ipv6-traffic-through-openvpn-tunnel)
+* [IPv6 – Proxy the neighbors (or come back ARP – we loved you really) « ipsidixit.net](http://www.ipsidixit.net/2010/03/24/239/)
 * [Configuring OpenVPN to use Firewalld instead of iptables on Centos 7 - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/149144/configuring-openvpn-to-use-firewalld-instead-of-iptables-on-centos-7)

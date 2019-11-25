@@ -18,6 +18,7 @@ Enjoy. 😁
 * [`halt` vs `reboot` vs `poweroff`](halt_reboot_poweroff.md)
 * [HEVC Encoding Notes](HEVC_encoding_notes.md)
 * [Hyper-V Notes](Hyper-V_Notes.md)
+* [Live Resize of A `btrfs` Partition](btrfs_live_resize.md)
 * [Multi-user RDP Sessions in Windows Client Editions](Multi-user_RDP_Sessions_in_client_Windows.md)
 * [`nginx` Notes](nginx_notes.md)
 * [Per-Monitor (v2) High DPI support in WPF and WinForms applications](PerMonitor_HiDPI_WPF_WinForms.md)
