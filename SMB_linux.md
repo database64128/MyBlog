@@ -2,6 +2,8 @@
 
 *First edition 2019-05-04.*
 
+*2020-01-23: added permissions in global settings.*
+
 ## SMB server - `samba`
 Install the `samba` package. `samba` doesn't come with a configuration file. You can get an example from [here](https://git.samba.org/samba.git/?p=samba.git;a=blob_plain;f=examples/smb.conf.default;hb=HEAD). Then modify entries as you like. Add your SMB share.
 
@@ -16,6 +18,13 @@ Install the `samba` package. `samba` doesn't come with a configuration file. You
    use sendfile = yes
    aio read size = 1
    aio write size = 1
+
+   ;inherit owner = unix only ; Inherit ownership of the parent directory for new files and directories
+   ;inherit permissions = yes ; Inherit permissions of the parent directory for new files and directories
+   create mask = 0644
+   directory mask = 2755
+   force create mode = 0644
+   force directory mode = 2755
 
 [homes]
 # my root share - created 2019-05-03
