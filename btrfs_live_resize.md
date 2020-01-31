@@ -1,6 +1,7 @@
 # Live Resize of A `btrfs` Partition
 
 *First edition 2019-11-02.*
+*Updated 2020-01-16.*
 
 ## Preps
 
@@ -17,14 +18,23 @@ GPT stores a backup header at the end of the disk. If you just enlarged the VHD,
 ```bash
 # gdisk
 /dev/sda
+x
 e
 ```
 
 Now that we have a good GPT, the partition can now be enlarged by deleting and recreating it.
 
 ```bash
+m
 d
 n
+```
+
+Verify your changes and save the GPT:
+
+```bash
+p
+w
 ```
 
 After saving the new GPT, use `partprobe` to inform the kernel of the change:

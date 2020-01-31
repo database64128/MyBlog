@@ -60,8 +60,47 @@ location /dav {
 * [Module ngx_http_dav_module](http://nginx.org/en/docs/http/ngx_http_dav_module.html)
 * [arut/nginx-dav-ext-module: nginx WebDAV PROPFIND,OPTIONS,LOCK,UNLOCK support](https://github.com/arut/nginx-dav-ext-module)
 
-## 3. Configuration Examples
-* Rewrite http request to https
+## 3. Reverse Proxy
+
+Here's a list of commonly used reverse proxy configurations for reference purposes.
+
+### a) Proxy for a website
+```
+location /mc-java/dynmap/ {
+    # The / at the end is significant.
+    proxy_pass http://[::1]:8123/;
+
+    proxy_pass_request_headers on;
+
+    proxy_set_header Host $host;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $http_host;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+}
+```
+
+### b) TCP stream proxy
+```
+stream {
+    server {
+        listen 25565;
+        proxy_pass 10.8.0.1:25565;
+    }
+}
+```
+
+### References
+* [Module ngx_stream_proxy_module](http://nginx.org/en/docs/stream/ngx_stream_proxy_module.html)
+* [Module ngx_stream_core_module](http://nginx.org/en/docs/stream/ngx_stream_core_module.html)
+* [Nginx real client IP to TCP stream backend - Stack Overflow](https://stackoverflow.com/questions/40873393/nginx-real-client-ip-to-tcp-stream-backend)
+
+## 4. Configuration Examples
+* Rewrite http URI to https
 ```json
 server {
     listen [::]:443 ssl http2 ipv6only=off;
