@@ -84,6 +84,7 @@ extension=bz2
 extension=curl
 extension=exif
 extension=gd
+extension=iconv
 extension=pdo_mysql
 extension=mysqli
 extension=zip

@@ -1,8 +1,12 @@
 # Configuring `OpenVPN` for a Linux server and a Windows client
 
 *First edition 2019-05-08.*
+
 *Updated 2019-05-19: removed an incorrect step in 'firewalld' configuration and fixed IPv6 configuration.*
+
 *Updated 2019-11-25: added steps for IPv6 NDP setup.*
+
+*Updated 2019-12-05: added ECDH curve parameters in server config for OpenVPN 2.4.8+*
 
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
@@ -22,6 +26,8 @@ set_var EASYRSA_ALGO     ec
 set_var EASYRSA_CURVE    secp521r1
 set_var EASYRSA_DIGEST   "sha512"
 ```
+
+*Starting with OpenVPN 2.4.8, you have to specify the type of ECDH curve in the server config. Otherwise it would choose the wrong type of ECDH curve and clients would fail to connect.*
 
 Now set up PKI and generate a CA certificate.
 ```shell
@@ -72,6 +78,7 @@ tls-crypt ta.key
 cipher AES-256-GCM
 auth SHA512
 tls-version-min 1.2
+ecdh-curve secp521r1
 persist-key
 persist-tun
 status openvpn-status.log
@@ -130,14 +137,14 @@ After a kernel update, a reboot is needed to be able to load new modules.
 ## References
 * [OpenVPN - ArchWiki](https://wiki.archlinux.org/index.php/OpenVPN)
 * [Easy-RSA - ArchWiki](https://wiki.archlinux.org/index.php/Easy-RSA)
-* [OpenVPN with Modern Cryptography](https://www.maths.tcd.ie/~fionn/misc/ec_vpn.php)
 * [Openvpn - Fedora Project Wiki](https://fedoraproject.org/wiki/Openvpn)
+* [OpenVPN 2.4 and pure elliptic curve crypto setup - OpenVPN Support Forum](https://forums.openvpn.net/viewtopic.php?f=4&t=23227)
+* [OpenVPN with Modern Cryptography](https://www.maths.tcd.ie/~fionn/misc/ec_vpn.php)
 * [tls - Is Common Name encoded in the certificate? - Cryptography Stack Exchange](https://crypto.stackexchange.com/questions/1836/is-common-name-encoded-in-the-certificate)
 * [Internet sharing - ArchWiki](https://wiki.archlinux.org/index.php/Internet_sharing#Enable_packet_forwarding)
 * [GettingStartedwithOVPN – OpenVPN Community](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
 * [2x HOW TO | OpenVPN](https://openvpn.net/community-resources/how-to/)
 * [[Solved] OpenVPN 2.3.1 - ERROR: Cannot open TUN/TAP dev /dev/net/tun / Networking, Server, and Protection / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=163377)
-* [OpenVPN 2.4 and pure elliptic curve crypto setup - Page 2 - OpenVPN Support Forum](https://forums.openvpn.net/viewtopic.php?t=23227&start=30)
 * [#805 (Could not determine IPv4/IPv6 protocol. Using AF_INET) – OpenVPN Community](https://community.openvpn.net/openvpn/ticket/805#no1)
 * [Routing public ipv6 traffic through openvpn tunnel - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/136211/routing-public-ipv6-traffic-through-openvpn-tunnel)
 * [IPv6 – Proxy the neighbors (or come back ARP – we loved you really) « ipsidixit.net](http://www.ipsidixit.net/2010/03/24/239/)
