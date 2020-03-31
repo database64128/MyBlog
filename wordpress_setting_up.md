@@ -7,7 +7,9 @@ And it took me almost a day to set up my own Wordpress site. Yes, almost a day.
 Quite a few friends have recently set up their website with `Wordpress`, or its derivatives. Decorated with gorgeous themes and neat little gadgets, their carefully-crafted web pages have once again, woke the idea of renovating my own half-broken poorly-maintained websites.
 
 > No one:
+>
 > Definitely no one:
+>
 > Me: Modified a Adobe Dreamweaver web page template to be my web page.
 
 So, with little to no experience with front-end development, I decided to start with the 5-min-setup Wordpress.
@@ -86,9 +88,9 @@ extension=pdo_mysql
 extension=mysqli
 extension=zip
 
-memory_limit = 256M
-post_max_size = 128M
-upload_max_filesize = 128M
+memory_limit = 1024M
+post_max_size = 768M
+upload_max_filesize = 512M
 ```
 
 Enable and start the `php-fpm` service:

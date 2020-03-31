@@ -1,6 +1,7 @@
 # Arch Linux Notes
 
 *First edition 2019-05-06.*
+*2020-01-29: Modified makepkg option to skip PGP check only.*
 
 ## 1. AUR
 `makepkg --asroot` has been dropped a few years ago. This means you can't build as root. It's recommended to build as a normal user. If you don't have any other user, there is a method to build as `nobody`.
@@ -14,7 +15,7 @@ chgrp nobody /home/build
 chmod g+ws /home/build
 setfacl -m u::rwx,g::rwx /home/build
 setfacl -d --set u::rwx,g::rwx,o::- /home/build
-sudo -u nobody makepkg --skipinteg
+sudo -u nobody makepkg --skippgpcheck
 pacman -U $package_name.tar.xz
 ```
 Use `--skipinteg` to skip PGP key verification.
