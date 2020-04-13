@@ -34,7 +34,7 @@ We are not installing `wordpress` with `pacman` but instead manually download an
 
 ```bash
 # wget https://wordpress.org/latest.tar.gz
-# tar xvzf latest.tar.gz
+# tar -xf latest.tar.gz
 ```
 
 ### Preparing `mariadb` and `php`
