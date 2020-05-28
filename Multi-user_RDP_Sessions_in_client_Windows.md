@@ -11,6 +11,7 @@ Search for Hex values of `39 81 3C 06 00 00 0F 84`.
 
 * On Windows 10 1809, it should be like `39 81 3C 06 00 00 0F 84 7F 2C 01 00`.
 * On Windows 10 1903, it should be like `39 81 3C 06 00 00 0F 84 5D 61 01 00`.
+* On Windows 10 2004. it should be like `39 81 3C 06 00 00 0F 84 D9 51 01 00`.
 
 Replace it with `B8 00 01 00 00 89 81 38 06 00 00 90`.
 
