@@ -8,6 +8,8 @@
 
 *Updated 2019-12-05: added ECDH curve parameters in server config for OpenVPN 2.4.8+*
 
+*Updated 2020-06-09: Minor cleanup.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
@@ -30,27 +32,30 @@ set_var EASYRSA_DIGEST   "sha512"
 *Starting with OpenVPN 2.4.8, you have to specify the type of ECDH curve in the server config. Otherwise it would choose the wrong type of ECDH curve and clients would fail to connect.*
 
 Now set up PKI and generate a CA certificate.
-```shell
-# cd /etc/easy-rsa
-# export EASYRSA=$(pwd)
-# export EASYRSA_VARS_FILE=/etc/easy-rsa/vars
-# easyrsa init-pki
-# easyrsa build-ca
+```bash
+$ cd /etc/easy-rsa
+$ export EASYRSA=$(pwd)
+$ export EASYRSA_VARS_FILE=/etc/easy-rsa/vars
+$ easyrsa init-pki
+$ easyrsa build-ca
 ```
 The generated CA certificate `/etc/easy-rsa/pki/ca.crt` should be copied to both server and client.
 
 ### Server and client certificates
 Generate and sign server certificate and client certificate.
-```shell
-# easyrsa gen-req servername nopass
-# easyrsa sign-req server servername
-# easyrsa gen-req clientname nopass
-# easyrsa sign-req client clientname
+```bash
+$ cd /etc/easy-rsa
+$ export EASYRSA=$(pwd)
+$ export EASYRSA_VARS_FILE=/etc/easy-rsa/vars
+$ easyrsa gen-req servername nopass
+$ easyrsa sign-req server servername
+$ easyrsa gen-req clientname nopass
+$ easyrsa sign-req client clientname
 ```
 Copy the server certificate and key to `/etc/openvpn/server/`.
 ### HMAC key
-```shell
-# openvpn --genkey --secret /etc/openvpn/server/ta.key
+```bash
+$ openvpn --genkey --secret /etc/openvpn/server/ta.key
 ```
 
 ## Make a configuration file
@@ -88,9 +93,9 @@ explicit-exit-notify 1
 
 ## Other changes
 ### Enable packet forwarding for both IPv4 & IPv6
-```shell
-sysctl net.ipv4.ip_forward=1
-sysctl net.ipv6.conf.all.forwarding=1
+```bash
+$ sysctl net.ipv4.ip_forward=1
+$ sysctl net.ipv6.conf.all.forwarding=1
 ```
 To make these changes permanent, modify `/etc/sysctl.d/30-ipforward.conf`:
 ```
@@ -102,21 +107,21 @@ net.ipv6.conf.all.forwarding=1
 Suppose you have your interface in `FedoraServer` zone.
 
 If you have `openvpn` running on a different port, copy the `openvpn` service definition and modify it:
-```shell
-cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn_xxx.xml
-nano /etc/firewalld/services/openvpn_xxx.xml
-firewall-cmd --zone=FedoraServer --add-service openvpn_xxx.xml
+```bash
+$ cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn_xxx.xml
+$ nano /etc/firewalld/services/openvpn_xxx.xml
+$ firewall-cmd --zone=FedoraServer --add-service openvpn_xxx.xml
 ```
 
 Now add masquerade rules:
-```shell
-firewall-cmd --zone=FedoraServer --add-masquerade
-firewall-cmd --runtime-to-permanent
+```bash
+$ firewall-cmd --zone=FedoraServer --add-masquerade
+$ firewall-cmd --runtime-to-permanent
 ```
 ## Finishing
 Use `ovpngen` to generate a `.ovpn` file for clients to use. Get the script from its [GitHub repo](https://github.com/graysky2/ovpngen), or [AUR](https://aur.archlinux.org/packages/ovpngen/).
-```shell
-# ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/issued/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
+```bash
+$ ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/issued/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
 ```
 The output `.ovpn` file should be modified to match server configuration.
 

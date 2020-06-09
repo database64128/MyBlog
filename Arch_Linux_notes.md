@@ -18,7 +18,7 @@ setfacl -d --set u::rwx,g::rwx,o::- /home/build
 sudo -u nobody makepkg --skippgpcheck
 pacman -U $package_name.tar.xz
 ```
-Use `--skipinteg` to skip PGP key verification.
+Use `--skippgpcheck` to skip PGP key verification.
 
 ### References
 * [Arch User Repository - ArchWiki](https://wiki.archlinux.org/index.php/Arch_User_Repository)
