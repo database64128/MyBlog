@@ -2,20 +2,20 @@
 
 Starting with .NET Framework 4.7, WPF and WinForms support the new Per-Monitor (v2) dynamic DPI support. The new feature needs opt-in.
 
-## WPF
+## WPF on .NET Framework 4.7+ and WinForms on .NET Core 3.0+
 
 Add the following to your app's manifest:
 
 ```
 <application xmlns="urn:schemas-microsoft-com:asm.v3">
     <windowsSettings>
-        <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2,PerMonitor</dpiAwareness>
-        <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true</dpiAware>
+        <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor, System</dpiAwareness>
+        <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/PM</dpiAware>
     </windowsSettings>
 </application>
 ```
 
-## WinForms
+## WinForms on .NET Framework 4.7 - 4.8
 
 In `manifest`, uncomment the following:
 
