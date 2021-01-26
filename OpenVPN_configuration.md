@@ -10,9 +10,12 @@
 
 *Updated 2020-06-09: Minor cleanup.*
 
+*Updated 2021-01-26: Removed firewalld masquerade configuration since it's unnecessary.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
+
 On most Linux distros, install `openvpn` package. Or build from source. On Windows, download the community build from <https://openvpn.net/community-downloads/>.
 
 Install `easy-rsa` package to manage certificates. Install `bridge-utils` for ethernet bridging.
@@ -20,6 +23,7 @@ Install `easy-rsa` package to manage certificates. Install `bridge-utils` for et
 ## Generating Certificates (PKI)
 
 ### CA
+
 For OpenVPN 2.4 or higher, use Easy-RSA to generate certificates and keys using elliptic curves.
 
 Append the following lines to `/etc/easy-rsa/vars` to use elliptic curves.
@@ -42,7 +46,9 @@ $ easyrsa build-ca
 The generated CA certificate `/etc/easy-rsa/pki/ca.crt` should be copied to both server and client.
 
 ### Server and client certificates
+
 Generate and sign server certificate and client certificate.
+
 ```bash
 $ cd /etc/easy-rsa
 $ export EASYRSA=$(pwd)
@@ -52,13 +58,17 @@ $ easyrsa sign-req server servername
 $ easyrsa gen-req clientname nopass
 $ easyrsa sign-req client clientname
 ```
+
 Copy the server certificate and key to `/etc/openvpn/server/`.
+
 ### HMAC key
+
 ```bash
 $ openvpn --genkey --secret /etc/openvpn/server/ta.key
 ```
 
 ## Make a configuration file
+
 Get configuration examples in `/usr/share/openvpn/examples/` on Arch Linux, or `/usr/share/doc/openvpn/sample` on Fedora. Copy `server.conf` to `/etc/openvpn/server/server.conf` and make modifications.
 
 Here's an example:
@@ -92,42 +102,49 @@ explicit-exit-notify 1
 ```
 
 ## Other changes
+
 ### Enable packet forwarding for both IPv4 & IPv6
+
+`/etc/sysctl.d/30-ipforward.conf`:
+
+```
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+net.ipv6.conf.all.proxy_ndp = 1
+net.ipv6.conf.all.accept_ra = 2
+```
+
 ```bash
-$ sysctl net.ipv4.ip_forward=1
-$ sysctl net.ipv6.conf.all.forwarding=1
-```
-To make these changes permanent, modify `/etc/sysctl.d/30-ipforward.conf`:
-```
-net.ipv4.ip_forward=1
-net.ipv6.conf.all.forwarding=1
+$ sysctl -p /etc/sysctl.d/30-ipforward.conf
 ```
 
 ### Add `firewalld` rules
+
 Suppose you have your interface in `FedoraServer` zone.
 
 If you have `openvpn` running on a different port, copy the `openvpn` service definition and modify it:
+
 ```bash
 $ cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn_xxx.xml
 $ nano /etc/firewalld/services/openvpn_xxx.xml
 $ firewall-cmd --zone=FedoraServer --add-service openvpn_xxx.xml
-```
-
-Now add masquerade rules:
-```bash
-$ firewall-cmd --zone=FedoraServer --add-masquerade
 $ firewall-cmd --runtime-to-permanent
 ```
+
 ## Finishing
+
 Use `ovpngen` to generate a `.ovpn` file for clients to use. Get the script from its [GitHub repo](https://github.com/graysky2/ovpngen), or [AUR](https://aur.archlinux.org/packages/ovpngen/).
+
 ```bash
 $ ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/issued/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
 ```
+
 The output `.ovpn` file should be modified to match server configuration.
 
 Run `openvpn /etc/openvpn/server/server.conf` to test configuration. When everything is ready, start the server service: `systemctl enable --now openvpn-server@server.service`.
 
 ## IPv6
+
 To assign public IPv6 addresses to clients, either set up a static route in your IPv6 gateway, or use DHCP-PD to get a prefix. Alternatively, if you don't have access to these methods, set up NDP (Neighbor Discovery Proxy) rules on the host machine. For example, the host machine faces a `/64` subnet via `eth0` and hosts a `/112` subnet via `tun0`. Enable IPv6 NDP in the kernel and add a NDP rule by executing:
 
 ```bash
@@ -136,7 +153,9 @@ $ ip neighbour add proxy 2001:abcd::1001 dev eth0
 ```
 
 ## Troubleshooting
+
 ### ERROR: Cannot open TUN/TAP dev /dev/net/tun: No such device (errno=19)
+
 After a kernel update, a reboot is needed to be able to load new modules.
 
 ## References
