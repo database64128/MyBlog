@@ -12,6 +12,8 @@
 
 *Updated 2021-01-26: Removed firewalld masquerade configuration since it's unnecessary.*
 
+*Updated 2021-05-08: Added back firewalld masquerade.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
@@ -63,8 +65,10 @@ Copy the server certificate and key to `/etc/openvpn/server/`.
 
 ### HMAC key
 
+Generate a static key on the server:
+
 ```bash
-$ openvpn --genkey --secret /etc/openvpn/server/ta.key
+$ openvpn --genkey secret /etc/openvpn/server/ta.key
 ```
 
 ## Make a configuration file
@@ -72,6 +76,7 @@ $ openvpn --genkey --secret /etc/openvpn/server/ta.key
 Get configuration examples in `/usr/share/openvpn/examples/` on Arch Linux, or `/usr/share/doc/openvpn/sample` on Fedora. Copy `server.conf` to `/etc/openvpn/server/server.conf` and make modifications.
 
 Here's an example:
+
 ```
 port 1194
 proto udp6
@@ -84,9 +89,9 @@ topology subnet
 server 10.32.64.0 255.255.255.0
 server-ipv6 2001:1234:5678:9abc:abcd::/112
 ifconfig-pool-persist ipp.txt
-push "redirect-gateway def1 bypass-dhcp ipv6"
-push "dhcp-option DNS 8.8.8.8"
-push "dhcp-option DNS 2001:4860:4860::8888"
+;push "redirect-gateway def1 bypass-dhcp ipv6"
+;push "dhcp-option DNS 8.8.8.8"
+;push "dhcp-option DNS 2001:4860:4860::8888"
 client-to-client
 keepalive 10 120
 tls-crypt ta.key
@@ -128,6 +133,12 @@ If you have `openvpn` running on a different port, copy the `openvpn` service de
 $ cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn_xxx.xml
 $ nano /etc/firewalld/services/openvpn_xxx.xml
 $ firewall-cmd --zone=FedoraServer --add-service openvpn_xxx.xml
+```
+
+Now add masquerade rules:
+
+```bash
+$ firewall-cmd --zone=FedoraServer --add-masquerade
 $ firewall-cmd --runtime-to-permanent
 ```
 
