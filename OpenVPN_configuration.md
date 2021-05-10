@@ -14,6 +14,8 @@
 
 *Updated 2021-05-08: Added back firewalld masquerade.*
 
+*Updated 2021-05-10: Add learn-address script and Windows interface metric issue.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
@@ -77,7 +79,7 @@ Get configuration examples in `/usr/share/openvpn/examples/` on Arch Linux, or `
 
 Here's an example:
 
-```
+```conf
 port 1194
 proto udp6
 dev tun
@@ -142,7 +144,7 @@ $ firewall-cmd --zone=FedoraServer --add-masquerade
 $ firewall-cmd --runtime-to-permanent
 ```
 
-## Finishing
+## Finish Up
 
 Use `ovpngen` to generate a `.ovpn` file for clients to use. Get the script from its [GitHub repo](https://github.com/graysky2/ovpngen), or [AUR](https://aur.archlinux.org/packages/ovpngen/).
 
@@ -156,11 +158,48 @@ Run `openvpn /etc/openvpn/server/server.conf` to test configuration. When everyt
 
 ## IPv6
 
-To assign public IPv6 addresses to clients, either set up a static route in your IPv6 gateway, or use DHCP-PD to get a prefix. Alternatively, if you don't have access to these methods, set up NDP (Neighbor Discovery Proxy) rules on the host machine. For example, the host machine faces a `/64` subnet via `eth0` and hosts a `/112` subnet via `tun0`. Enable IPv6 NDP in the kernel and add a NDP rule by executing:
+To assign public IPv6 addresses to clients, set up a learn-address script to configure NDP (Neighbor Discovery Proxy) on client connecting.
+
+`/etc/openvpn/server/learn-address.sh`:
 
 ```bash
-$ sysctl net.ipv6.conf.all.proxy_ndp = 1
-$ ip neighbour add proxy 2001:abcd::1001 dev eth0
+#!/bin/bash
+
+action="$1"
+addr="$2"
+
+case "$action" in
+    add | update)
+        /usr/sbin/ip neigh replace proxy "$addr" dev ens3
+        ;;
+    delete)
+        /usr/sbin/ip neigh del proxy "$addr" dev ens3
+        ;;
+esac
+```
+
+`/etc/openvpn/server/server.conf`:
+
+```conf
+script-security 2
+learn-address learn-address.sh
+```
+
+## Windows
+
+On Windows 10, the system DNS client chooses the DNS server whose network interface has the lowest metric value. If your TUN/TAP interface has a higher metric value than your physical interface or dial-up interface, DNS won't work properly.
+
+To resolve the issue, modify your VPN interface metric to be lower than any other interface.
+
+```powershell
+# Print interface information.
+Get-NetIPInterface
+
+# Set interface 8's IPv4 metric to 5.
+Set-NetIPInterface -InterfaceIndex 8 -AddressFamily IPv4 -InterfaceMetric 5
+
+# Set interface 8's IPv6 metric to 5.
+Set-NetIPInterface -InterfaceIndex 8 -AddressFamily IPv6 -InterfaceMetric 5
 ```
 
 ## Troubleshooting
@@ -170,6 +209,7 @@ $ ip neighbour add proxy 2001:abcd::1001 dev eth0
 After a kernel update, a reboot is needed to be able to load new modules.
 
 ## References
+
 * [OpenVPN - ArchWiki](https://wiki.archlinux.org/index.php/OpenVPN)
 * [Easy-RSA - ArchWiki](https://wiki.archlinux.org/index.php/Easy-RSA)
 * [Openvpn - Fedora Project Wiki](https://fedoraproject.org/wiki/Openvpn)
@@ -184,3 +224,4 @@ After a kernel update, a reboot is needed to be able to load new modules.
 * [Routing public ipv6 traffic through openvpn tunnel - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/136211/routing-public-ipv6-traffic-through-openvpn-tunnel)
 * [IPv6 – Proxy the neighbors (or come back ARP – we loved you really) « ipsidixit.net](http://www.ipsidixit.net/2010/03/24/239/)
 * [Configuring OpenVPN to use Firewalld instead of iptables on Centos 7 - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/149144/configuring-openvpn-to-use-firewalld-instead-of-iptables-on-centos-7)
+* [Force DNS Lookup Over Windows VPN Connection | Notes by Tom](https://notesbytom.wordpress.com/2018/03/12/force-dns-lookup-over-windows-vpn-connection/)
