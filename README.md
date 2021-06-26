@@ -1,9 +1,11 @@
 # My Blog
+
 Articles here are mostly notes of 🖥 software configuration and 🛠 problem solving. Also other stuff like 💖 personal thoughts or whatever. Opinions are my own.
 
 Enjoy. 😁
 
 ## 📚 Index
+
 * [Arch Linux Installation Steps](Arch_Linux_Installation_Steps.md)
 * [Arch Linux Notes](Arch_Linux_notes.md)
 * [Basic Git Usage](Basic_Git_Usage.md)
@@ -13,6 +15,7 @@ Enjoy. 😁
 * [Configuring OpenVPN](OpenVPN_configuration.md)
 * [Configuring `xrdp` to run a Gnome session with Xorg](xrdp_configuration.md)
 * [Fedora Notes](Fedora_Notes.md)
+* [Firefox on Wayland: Layers of Workarounds](Firefox_on_Wayland.md)
 * [How to Connect to A Remote Hyper-V Server Using Powershell](Connect_to_A_Remote_Hyper-V_Server_Using_Powershell)
 * [Gnome Keyring and SSH Keys](Gnome_Keyring_and_SSH_keys.md)
 * [`halt` vs `reboot` vs `poweroff`](halt_reboot_poweroff.md)
@@ -31,4 +34,5 @@ Enjoy. 😁
 * [Workaround: On Windows 10 Version 1903, `dwm.exe` stuck in a single-thread loop after disconnecting from an RDP session](Workaround_Win_1903_dwm_loop_RDP.md)
 
 ## License
+
 Licensed under the [CC-BY-SA-4.0](LICENSE) license.
