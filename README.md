@@ -21,6 +21,7 @@ Enjoy. 😁
 * [`halt` vs `reboot` vs `poweroff`](halt_reboot_poweroff.md)
 * [HEVC Encoding Notes](HEVC_encoding_notes.md)
 * [Hyper-V Notes](Hyper-V_Notes.md)
+* [Improving Shell Experience on Arch Linux](linux-shell-experience.md)
 * [Live Resize of A `btrfs` Partition](btrfs_live_resize.md)
 * [Multi-user RDP Sessions in Windows Client Editions](Multi-user_RDP_Sessions_in_client_Windows.md)
 * [`nginx` Notes](nginx_notes.md)
