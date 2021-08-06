@@ -16,6 +16,8 @@
 
 *Updated 2021-05-10: Add learn-address script and Windows interface metric issue.*
 
+*Updated 2021-08-06: Mention firewalld intra zone forwarding.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
@@ -40,7 +42,7 @@ set_var EASYRSA_DIGEST   "sha512"
 *Starting with OpenVPN 2.4.8, you have to specify the type of ECDH curve in the server config. Otherwise it would choose the wrong type of ECDH curve and clients would fail to connect.*
 
 Now set up PKI and generate a CA certificate.
-```bash
+```console
 $ cd /etc/easy-rsa
 $ export EASYRSA=$(pwd)
 $ export EASYRSA_VARS_FILE=/etc/easy-rsa/vars
@@ -53,7 +55,7 @@ The generated CA certificate `/etc/easy-rsa/pki/ca.crt` should be copied to both
 
 Generate and sign server certificate and client certificate.
 
-```bash
+```console
 $ cd /etc/easy-rsa
 $ export EASYRSA=$(pwd)
 $ export EASYRSA_VARS_FILE=/etc/easy-rsa/vars
@@ -69,7 +71,7 @@ Copy the server certificate and key to `/etc/openvpn/server/`.
 
 Generate a static key on the server:
 
-```bash
+```console
 $ openvpn --genkey secret /etc/openvpn/server/ta.key
 ```
 
@@ -121,34 +123,38 @@ net.ipv6.conf.all.proxy_ndp = 1
 net.ipv6.conf.all.accept_ra = 2
 ```
 
-```bash
+```console
 $ sysctl -p /etc/sysctl.d/30-ipforward.conf
 ```
 
 ### Add `firewalld` rules
 
-Suppose you have your interface in `FedoraServer` zone.
+Suppose you have your public network interface in the `public` zone.
 
 If you have `openvpn` running on a different port, copy the `openvpn` service definition and modify it:
 
-```bash
-$ cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn_xxx.xml
-$ nano /etc/firewalld/services/openvpn_xxx.xml
-$ firewall-cmd --zone=FedoraServer --add-service openvpn_xxx.xml
+```console
+$ cp /usr/lib/firewalld/services/openvpn.xml /etc/firewalld/services/openvpn-custom.xml
+$ nano /etc/firewalld/services/openvpn-custom.xml
+$ firewall-cmd --permanent --zone=public --add-service openvpn-custom.xml
 ```
 
-Now add masquerade rules:
+To accept inbound IPv6 traffic from the Internet, __explicitly__ place the TUN interface in the same zone as the public-facing interface, then enable [intra zone forwarding](https://firewalld.org/2020/04/intra-zone-forwarding). Note that since `firewalld v1.0.0`, intra zone forwarding is enabled by default.
 
-```bash
-$ firewall-cmd --zone=FedoraServer --add-masquerade
-$ firewall-cmd --runtime-to-permanent
+IPv4 NAT requires masquerade to work.
+
+```console
+$ firewall-cmd --permanent --zone=public --change-interface=tun0
+$ firewall-cmd --permanent --zone=public --add-forward
+$ firewall-cmd --permanent --zone=public --add-masquerade
+$ firewall-cmd --reload
 ```
 
 ## Finish Up
 
 Use `ovpngen` to generate a `.ovpn` file for clients to use. Get the script from its [GitHub repo](https://github.com/graysky2/ovpngen), or [AUR](https://aur.archlinux.org/packages/ovpngen/).
 
-```bash
+```console
 $ ./ovpngen example.org /etc/openvpn/server/ca.crt /etc/easy-rsa/pki/issued/client1.crt /etc/easy-rsa/pki/private/client1.key /etc/openvpn/server/ta.key 1194 udp > foo.ovpn
 ```
 
