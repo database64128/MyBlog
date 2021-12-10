@@ -18,6 +18,8 @@
 
 *Updated 2021-08-06: Mention firewalld intra zone forwarding.*
 
+*Updated 2021-12-10: Skip IPv4 in learn address script.*
+
 As of writing, `OpenVPN` is one of the most advanced and secure VPN solution. Its open-source nature and the use of certificates ensures a safe VPN connection. However, `OpenVPN` can be quite hard to configure for the first time. In this tutorial, I will walk you through the steps to configure a safe `OpenVPN` server with IPv4 and IPv6 dual-stack.
 
 ## Installation
@@ -173,6 +175,11 @@ To assign public IPv6 addresses to clients, set up a learn-address script to con
 
 action="$1"
 addr="$2"
+
+# Skip IPv4.
+if [[ "$addr" = *.*.*.* ]]; then
+    exit 0
+fi
 
 case "$action" in
     add | update)
