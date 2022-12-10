@@ -1,32 +1,21 @@
 # Arch Linux Installation Steps
 
-*First edition 2018-09-06.*
-
-*Updated 2019-03-06: Migrated to markdown and other minor edits.*
-
-*Updated 2021-01-26: Keep it up-to-date.*
-
-*Updated 2021-10-23: btrfs subvolume creation and user password.*
-
 An opinionated installation guide for Arch Linux.
 
-## Preparations
+## 1. Pre-installation
 
-Make sure you are connected to the internet.
+### 1.1. Checklist
 
-```console
-# ip addr
-# networkctl status
-# ping archlinux.org
+Make sure the live system is connected to the internet and has the right system time:
+
+```bash
+ip addr
+networkctl status
+ping archlinux.org
+timedatectl status
 ```
 
-Use `timedatectl(1)` to ensure the system clock is accurate:
-```console
-# timedatectl set-ntp true
-# timedatectl status
-```
-
-## Partitioning
+### 1.2. Partitioning
 
 Use `gdisk` to create a **GUID Partition Table (GPT)** and necessary partitions.
 
@@ -40,102 +29,92 @@ Use `gdisk` to create a **GUID Partition Table (GPT)** and necessary partitions.
 
 Then verify the partitions created:
 
-```console
-# lsblk -f
+```bash
+lsblk -f
 ```
 
-Format the partitions. For SSDs and VHDs, enable `discard` with `-d` option.
+Format and mount the partitions:
 
-```console
-# mkfs.fat -F 32 -n ESP /dev/nvme0n1p1
-# mkfs.btrfs -L "Arch Linux" /dev/nvme0n1p2
-# lsblk -f
+```bash
+mkfs.fat -F 32 -n ESP /dev/nvme0n1p1
+mkfs.btrfs -L archlinux /dev/nvme0n1p2
+mount -o noatime,compress=zstd,ssd,discard /dev/nvme0n1p2 /mnt
+mkdir /mnt/efi /mnt/boot
+mount -o noatime,discard /dev/nvme0n1p1 /mnt/efi
+mount -o noatime,discard /dev/nvme0n1p1 /mnt/boot
 ```
-
-## Mount the partitions
-
-Note that for VHDs and SSDs, it is recommended to mount with discard option.
-
-```console
-# mount -o noatime,compress=zstd,ssd,discard /dev/nvme0n1p2 /mnt
-# mkdir /mnt/efi /mnt/boot
-# mount -o noatime,discard /dev/nvme0n1p1 /mnt/efi
-# mount -o noatime,discard /dev/nvme0n1p1 /mnt/boot
-```
-
-## Create btrfs subvolumes
 
 Create subvolumes for common directories.
 
-```console
-# cd /mnt/
-# btrfs sub create etc
-# btrfs sub create home
-# btrfs sub create opt
-# btrfs sub create root
-# btrfs sub create srv
-# btrfs sub create usr
-# btrfs sub create var
-# btrfs sub create var/cache
-# btrfs sub create var/lib
-# btrfs sub create var/log
+```bash
+cd /mnt/
+btrfs sub create etc
+btrfs sub create home
+btrfs sub create opt
+btrfs sub create root
+btrfs sub create srv
+btrfs sub create usr
+btrfs sub create var
+btrfs sub create var/cache
+btrfs sub create var/lib
+btrfs sub create var/log
 ```
 
-## Select mirrors for `pacman`
+## 2. Installation
 
-Back up the existing `/etc/pacman.d/mirrorlist`:
+### 2.1. Select Mirrors
 
-```console
-# mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+Check and clean up `/etc/pacman.d/mirrorlist`:
+
+```bash
+nano /etc/pacman.d/mirrorlist
 ```
 
-Then get a mirror list from the official [Pacman Mirrorlist Generator](https://www.archlinux.org/mirrorlist/).
+### 2.2. Install Bootstrap Packages
 
-## Install the `base` package group
+Use the `pacstrap` script to install bootstrap packages:
 
-Use the `pacstrap` script to install necessary packages:
-
-```console
-# pacstrap /mnt base base-devel linux linux-firmware btrfs-progs nano htop sudo tmux man-db man-pages texinfo
+```bash
+pacstrap -K /mnt base base-devel linux linux-firmware btrfs-progs nano htop sudo tmux man-db man-pages texinfo
 ```
 
-For desktops and laptops, install a desktop environment.
+## 3. Configuration
 
-## Configurations
-
-### fstab
+### 3.1. fstab
 
 Generate an `fstab` file (use `-U` or `-L` to define by UUID or labels, respectively):
 
-```console
-# genfstab -U /mnt >> /mnt/etc/fstab
+```bash
+genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
-Check the resulting file in `/mnt/etc/fstab` afterwards, and edit it in case of errors. **You may want to add discard options for each partition.**
+Check the resulting file in `/mnt/etc/fstab` afterwards, and edit it in case of errors.
 
-### chroot
+### 3.2. chroot
 
 Change root into the newly-installed system to make further changes:
-```console
-# arch-chroot /mnt
+
+```bash
+arch-chroot /mnt
 ```
 
-### Time Zones
+### 3.3. Time Zones
+
 Set the time zone:
 
-```console
-# ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+```bash
+ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
 ```
 
 Run `hwclock(8)` to generate `/etc/adjtime`:
 
-```console
-# hwclock --systohc
+```bash
+hwclock --systohc
 ```
 
 This command assumes the hardware clock is set to UTC. See [Time#Time standard](https://wiki.archlinux.org/index.php/Time#Time_standard) for details.
 
-### Localization
+### 3.4. Localization
 
 Uncomment `en_US.UTF-8 UTF-8` and other needed locales in `/etc/locale.gen`, and generate them with:
 
@@ -146,11 +125,12 @@ Uncomment `en_US.UTF-8 UTF-8` and other needed locales in `/etc/locale.gen`, and
 Set the `LANG` variable in `locale.conf(5)` accordingly, for example:
 
 `/etc/locale.conf`
-```console
+
+```
 LANG=en_US.UTF-8
 ```
 
-### Networking
+### 3.5. Networking
 
 Create the `hostname` file:
 
@@ -177,7 +157,7 @@ For desktops and laptops, enable `NetworkManager`. For headless servers, enable 
 If the system has a permanent IP address, it should be used instead of `127.0.1.1`.
 Complete the [network configuration](https://wiki.archlinux.org/index.php/Network_configuration) for the newly installed environment.
 
-### Users and permissions
+### 3.6. Users and permissions
 
 Set the root password:
 
@@ -188,7 +168,6 @@ Set the root password:
 Create a new user for yourself:
 
 ```console
-# touch /etc/subuid /etc/subgid
 # useradd -mc "Full Name" -G wheel -s /usr/bin/fish <username>
 # passwd <username>
 ```
@@ -206,9 +185,21 @@ Configure `/etc/sudoers` to allow users in the `wheel` group to use `sudo`:
 %wheel ALL=(ALL) ALL
 ```
 
-### Boot loader
+### 3.7. Additional Packages
 
-Choose [systemd-boot](https://wiki.archlinux.org/index.php/Systemd-boot) to boot from the kernel in ESP. Choose [GRUB](https://wiki.archlinux.org/index.php/GRUB) to boot from anywhere. Choose [Syslinux](https://wiki.archlinux.org/index.php/Syslinux) if you installed to a [partitionless btrfs disk](https://wiki.archlinux.org/index.php/Btrfs#Partitionless_Btrfs_disk).
+
+For desktops and laptops, install a desktop environment and additional packages. Here's a list of my opinionated package selection:
+
+```bash
+# TODO: Actually go through my pacman.log to compile this list of packages.
+pacman -Syu --needed
+```
+
+### 3.8. Boot loader
+
+- Choose [systemd-boot](https://wiki.archlinux.org/index.php/Systemd-boot) to boot from the kernel in ESP.
+- Choose [GRUB](https://wiki.archlinux.org/index.php/GRUB) to boot from anywhere.
+- Choose [Syslinux](https://wiki.archlinux.org/index.php/Syslinux) if you installed to a [partitionless btrfs disk](https://wiki.archlinux.org/index.php/Btrfs#Partitionless_Btrfs_disk).
 
 To install `GRUB`:
 
@@ -225,6 +216,6 @@ Exit the chroot environment and reboot.
 # reboot
 ```
 
-## Post Installation
+## Post-installation
 
 Configure a firewall. Install your favorite [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers).
